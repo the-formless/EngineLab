@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(engine_lab
     src/main.cpp
     src/math/vec3.cpp
+    tests/math_tests.cpp
 )
 
 target_include_directories(engine_lab PRIVATE
