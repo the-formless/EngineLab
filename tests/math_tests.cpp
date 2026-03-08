@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "math/vec3.h"
+#include "math/vec4.h"
 #include "test_utils.h"
 
 bool floatEqual(float a, float b, float eps = 1e-5f) {
@@ -86,6 +87,15 @@ void test_lerp() {
     TEST_ASSERT((floatEqual(result.x, 5.0f) && floatEqual(result.y, 10.0f) && floatEqual(result.z, 15.0f)), "Lerp ");
 }
 
+void test_vec4_dot() {
+    Vec4 a(1,2,3,4);
+    Vec4 b(5,6,7,8);
+
+    float result = Vec4::dot(a,b);
+
+    TEST_ASSERT(floatEqual(result, 70.0f), "Vec4 dot");
+}
+
 void run_math_tests()
 {
     std::cout << "Running math tests...\n";
@@ -98,4 +108,5 @@ void run_math_tests()
     test_cross_perpendicular();
     test_reflect();
     test_lerp();
+    test_vec4_dot();
 }
