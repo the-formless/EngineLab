@@ -51,6 +51,41 @@ void test_length() {
     TEST_ASSERT(floatEqual(len, 6.0f), "Length ");
 }
 
+void test_dot_orthogonal() {
+    Vec3 a(1,2,-1);
+    Vec3 b(1,1,3);
+    float dot = Vec3::dot(a,b);
+    TEST_ASSERT(floatEqual(dot, 0.0f), "Dot Orthogonal");
+}
+
+void test_cross_perpendicular() {
+    Vec3 a(1,0,0);
+    Vec3 b(0,1,0);
+    Vec3 cross = Vec3::cross(a,b);
+
+    float dotA = Vec3::dot(a, cross);
+    float dotB = Vec3::dot(b, cross);
+
+    TEST_ASSERT((floatEqual(dotA, 0.0f) && floatEqual(dotB, 0.0f)), "Cross Perpendicular ");
+}
+
+void test_reflect() {
+    Vec3 i(5,-5,0);
+    Vec3 n(-1,0,0);
+    Vec3 r = Vec3::reflect(i,n);
+
+    // TEST_ASSERT((r.x == -5.0f && r.y == -5.0f && r.z == 0.0f), "Reflect ");
+    TEST_ASSERT((floatEqual(r.x, -5.0f) && floatEqual(r.y, -5.0f) && floatEqual(r.z, 0.0f)), "Reflect ");
+}
+
+void test_lerp() {
+    Vec3 a(0,0,0);
+    Vec3 b(10,20,30);
+    float t = 0.5f;
+    Vec3 result = Vec3::lerp(a,b,t);
+    TEST_ASSERT((floatEqual(result.x, 5.0f) && floatEqual(result.y, 10.0f) && floatEqual(result.z, 15.0f)), "Lerp ");
+}
+
 void run_math_tests()
 {
     std::cout << "Running math tests...\n";
@@ -59,4 +94,8 @@ void run_math_tests()
     test_cross();
     test_normalize();
     test_length();
+    test_dot_orthogonal();
+    test_cross_perpendicular();
+    test_reflect();
+    test_lerp();
 }
