@@ -154,7 +154,7 @@ void testMat4XMat4() {
     Mat4 c2 = b * a;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++) {
-            if(c2[i][j] != r[i][j])
+            if(!floatEqual(c2[i][j], r[i][j]))
                 equalMatrix = false;
         }
     }
@@ -175,13 +175,77 @@ void testIdentityLaw() {
     bool equalMatrix2 = true;
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++) {
-            if(c[i][j] != a[i][j])
+            if(!floatEqual(c[i][j], a[i][j]))
                 equalMatrix1 = false;
-            if(c2[i][j] != a[i][j])
+            if(!floatEqual(c2[i][j], a[i][j]))
                 equalMatrix2 = false;
         }
     }
     TEST_ASSERT(equalMatrix1 && equalMatrix2, "Identity Law followed");
+}
+
+void testMat4Transpose() {
+    Mat4 a({
+        Vec4(1.0f, 2.0f, 3.0f, 4.0f),
+        Vec4(5.0f, 6.0f, 7.0f, 8.0f),
+        Vec4(9.0f, 10.0f, 11.0f, 12.0f),
+        Vec4(13.0f, 14.0f, 15.0f, 16.0f)
+    });
+    Mat4 at({
+        Vec4(1.0f, 5.0f, 9.0f, 13.0f),
+        Vec4(2.0f, 6.0f, 10.0f, 14.0f),
+        Vec4(3.0f, 7.0f, 11.0f, 15.0f),
+        Vec4(4.0f, 8.0f, 12.0f, 16.0f)
+    });
+    Mat4 t = a.transpose();
+    float equalMatrix = true;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++) {
+            if(!floatEqual(t[i][j], at[i][j]))
+                equalMatrix = false;
+        }
+    }
+    TEST_ASSERT(equalMatrix, "Transpose Verified ");
+}
+
+void testMat4Translation() {
+    Mat4 a({
+        Vec4(1.0f, 0.0f, 0.0f, 2.0f),
+        Vec4(0.0f, 1.0f, 0.0f, -3.0f),
+        Vec4(0.0f, 0.0f, 1.0f, 1.5f),
+        Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+    });
+
+    Vec3 t(2.0f, -3.0f, 1.5f);
+
+    Mat4 aTranslation(Mat4::translation(t));
+
+    float equalMatrix = true;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++) {
+            if(!floatEqual(a[i][j], aTranslation[i][j]))
+                equalMatrix = false;
+        }
+    }
+    TEST_ASSERT(equalMatrix, "Translation Verified ");
+}
+
+void testRotationX() {
+    Mat4 a({
+        Vec4(1.0f, 0.0f, 0.0f, 0.0f),
+        Vec4(0.0f, 0.0f, -1.0f, 0.0f),
+        Vec4(0.0f, 1.0f, 0.0f, 0.0f),
+        Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+    });
+
+    Vec4 p(0.0f, 1.0f, 0.0f, 1.0f);
+
+    Vec4 ap(0.0f, 0.0f, 1.0f, 1.0f);
+
+    Vec4 cp = Mat4::rotateX(90.0f) * p;
+
+    bool success = floatEqual(ap.x, cp.x) && floatEqual(ap.y, cp.y) && floatEqual(ap.z, cp.z) && floatEqual(ap.w, cp.w);
+    TEST_ASSERT(success, "Rotation counterclockwise X-axis ");
 }
 
 void run_math_tests()
@@ -201,4 +265,7 @@ void run_math_tests()
     testFailMat4xVec4();
     testMat4XMat4();
     testIdentityLaw();
+    testMat4Transpose();
+    testMat4Translation();
+    testRotationX();
 }

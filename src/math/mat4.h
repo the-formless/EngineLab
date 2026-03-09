@@ -77,4 +77,63 @@ struct Mat4 {
         }
         return result;
     }
+
+    inline Mat4 transpose() const {
+        Mat4 t;
+        for(int i = 0; i < 4; i++) {
+            Vec4 newRow;
+            for(int j = 0; j < 4; j++) {
+                newRow[j] = rows[j][i];
+            }
+            t.rows[i] = newRow;
+        }
+        return t;
+    }
+
+    static inline Mat4 translation(Vec3 t) {
+        return Mat4(
+            Vec4(1.0f, 0.0f, 0.0f, t.x),
+            Vec4(0.0f, 1.0f, 0.0f, t.y),
+            Vec4(0.0f, 0.0f, 1.0f, t.z),
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+        );
+    }
+
+    static inline Mat4 scale(Vec3 s) {
+        return Mat4(
+            Vec4(s.x, 0.0f, 0.0f, 0.0f),
+            Vec4(0.0f, s.y, 0.0f, 0.0f),
+            Vec4(0.0f, 0.0f, s.z, 0.0f),
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+        );
+    }
+
+    static inline Mat4 rotateX(float angle) {
+        float a = angle * M_PI / 180.0f;
+        return Mat4(
+            Vec4(1.0f, 0.0f, 0.0f, 0.0f),
+            Vec4(0.0f, std::cos(a), -std::sin(a), 0.0f),
+            Vec4(0.0f, std::sin(a), std::cos(a), 0.0f),
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+        );
+    }
+
+    static inline Mat4 rotateY(float angle) {
+        float a = angle * M_PI / 180.0f;
+        return Mat4(
+            Vec4(std::cos(a), 0.0f, std::sin(a), 0.0f),
+            Vec4(0.0f, 1.0f, 0.0f, 0.0f),
+            Vec4(-std::sin(a), 0.0f, std::cos(a), 0.0f),
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+        );
+    }
+    static inline Mat4 rotateZ(float angle) {
+        float a = angle * M_PI / 180.0f;
+        return Mat4(
+            Vec4(std::cos(a), -std::sin(a), 0.0f, 0.0f),
+            Vec4(std::sin(a), std::cos(a), 0.0f , 0.0f),
+            Vec4(0.0f, 0.0f, 1.0f, 0.0f),
+            Vec4(0.0f, 0.0f, 0.0f, 1.0f)
+        );
+    }
 };
