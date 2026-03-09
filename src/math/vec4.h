@@ -11,21 +11,40 @@ struct Vec4 {
 
     Vec4(Vec3 v, float w) : x(v.x), y(v.y), z(v.z), w(w) {}
 
-    Vec4 operator+(const Vec4& other) {
+    inline Vec4 operator+(const Vec4& other) const {
         return Vec4(x+other.x, y+other.y, z+other.z, w+other.w);
     }
 
-    Vec4 operator-(const Vec4& other) {
+    inline Vec4 operator-(const Vec4& other) const {
         return Vec4(x-other.x, y-other.y, z-other.z, w-other.w);
     }
 
-    Vec4 operator*(const float scalar) {
+    inline Vec4 operator*(const float scalar) const {
         return Vec4(x*scalar, y*scalar, z*scalar, w*scalar);
     }
 
-    Vec4 operator/(const float divisor) {
+    inline Vec4 operator/(const float divisor) const {
         float inv = 1.0f/divisor;
         return Vec4(x*inv, y*inv, z*inv, w*inv);
+    }
+
+    inline float operator[](int i) const {
+        switch(i){
+            case 0: 
+            return x;
+            case 1:
+            return y;
+            case 2:
+            return z;
+            case 3:
+            return w;
+            default:
+            return 0.0f;
+        }
+    }
+
+    inline float& operator[](int i) {
+        return (&x)[i];
     }
 
     inline float length() const {
