@@ -5,10 +5,6 @@
 #include "math/mat4.h"
 #include "test_utils.h"
 
-bool floatEqual(float a, float b, float eps = 1e-5f) {
-    return std::fabs(a-b) < eps;
-}
-
 void testDot() {
     Vec3 a(1,2,3);
     Vec3 b(4,5,6);
@@ -248,7 +244,7 @@ void testRotationX() {
     TEST_ASSERT(success, "Rotation counterclockwise X-axis ");
 }
 
-void run_math_tests()
+void runMathTests()
 {
     std::cout << "Running math tests...\n";
 

@@ -1,7 +1,8 @@
 #include <iostream>
 #include "math/vec3.h"
 
-void run_math_tests();
+void runMathTests();
+void runFrameBufferTests();
 
 int main() {
     Vec3 a(1.0f, 2.0f, 3.0f);
@@ -21,7 +22,8 @@ int main() {
 
     std::cout << f.x << " " << f.y << " " << f.z << std::endl;
 
-    run_math_tests();   
+    runMathTests();   
+    runFrameBufferTests();
     
     return 0;
 }
