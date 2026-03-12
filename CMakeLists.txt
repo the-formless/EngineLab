@@ -10,6 +10,7 @@ find_package(SDL2 REQUIRED)
 
 add_executable(engine_lab
     src/main.cpp
+    src/renderer/sdl_window.cpp
     tests/math_tests.cpp
     tests/frame_buffer_tests.cpp
 )

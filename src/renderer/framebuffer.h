@@ -1,22 +1,25 @@
+#pragma once
+
 #include <iostream>
 #include <cstdint>
 #include <vector>
 
 #define WHITE 0xFFFFFFFF
-#define BLACK 0xFFFFFFFF
-#define RED   0xFFFFFFFF
-#define GREEN 0xFFFFFFFF
-#define BLUE  0xFFFFFFFF
+#define BLACK 0xFF000000
+#define RED   0xFFFF0000
+#define GREEN 0xFF00FF00
+#define BLUE  0xFF0000FF
 
 struct FrameBuffer {
-    float height, width;
+    int width;
+    int height;
     std::vector<uint32_t> pixels;
 
-    FrameBuffer() : height(600.0f), width(800.0f){
+    FrameBuffer() : width(800), height(600){
         pixels.resize(height * width);
     }
 
-    FrameBuffer(float h, float w) : height(h), width(w){
+    FrameBuffer(int h, int w) : width(w), height(h){
         pixels.resize(height * width);
     }
 
@@ -29,7 +32,6 @@ struct FrameBuffer {
     inline void setPixel(int x, int y, uint32_t color) {
         //convert x,y to a 1d array index
         //index = y * width + x
-        int index = y * width + x;
         if(x < 0 || x >= width){
             return ;
         }
@@ -37,6 +39,7 @@ struct FrameBuffer {
             return;
         }
         
+        int index = y * width + x;
         pixels[index] = color;
 
     }
