@@ -31,9 +31,7 @@ void SDLWindow::present(FrameBuffer& fb) {
 
 bool SDLWindow::processEvents() {
     SDL_Event event;
-    std::cout<<"starting while loop !!! \n";
     while(SDL_PollEvent(&event)){
-        std::cout<<"while reached !!! \n";
         if(event.type == SDL_KEYDOWN)
             std::cout<<"Key Pressed !!! \n";
         if(event.type == SDL_QUIT)
