@@ -39,4 +39,34 @@ class Rasterizer {
                 }
             }
         }
+        inline static void drawTriangle(FrameBuffer& fb, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+            int minX = std::min(std::min(x0, x1), x2);
+            int maxX = std::max(std::max(x0, x1), x2);
+
+            int minY = std::min(std::min(y0, y1), y2);
+            int maxY = std::max(std::max(y0, y1), y2);
+
+            for(int y = minY; y <= maxY; y++) {
+                for(int x = minX; x <= maxX; x++){
+                    int e0 = edgeFunction(x, y, x0, y0, x1, y1);
+                    int e1 = edgeFunction(x, y, x1, y1, x2, y2);
+                    int e2 = edgeFunction(x, y, x2, y2, x0, y0);
+                    if((e0 >= 0 &&
+                        e1 >= 0 && 
+                        e2 >= 0) ||
+                        (e0 <= 0 &&
+                        e1 <= 0 && 
+                        e2 <= 0)
+                    ){
+                        fb.setPixel(x, y, color);
+                    }
+                }
+            }
+
+        }
+    
+    private:
+        inline static int edgeFunction(int x, int y, int ex0, int ey0, int ex1, int ey1) {
+            return (x - ex0 ) * (ey1 - ey0) - (y - ey0) * (ex1 - ex0);
+        }
 };

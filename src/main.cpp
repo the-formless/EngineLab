@@ -27,6 +27,9 @@ int main() {
         Rasterizer::drawLine(fb, 400, 100, 200, 500, GREEN);
         Rasterizer::drawLine(fb, 300, 500, 400, 100, BLUE);
 
+        // Rasterizer::drawTriangle(fb, 200,100,100,400,500,400, WHITE);
+        Rasterizer::drawTriangle(fb, 10,10,300,40,40,400, GREEN);
+
         window.present(fb);
 
     }
