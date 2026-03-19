@@ -55,6 +55,10 @@ int main() {
         Mat4 model = Mat4::rotateY(angle)  * Mat4::rotateX(angle * 0.5f);;
 
         for(const auto& c : g.cells) {
+        //     Vec3 tv0 = transformVertex(c.v0, model);
+        //     Vec3 tv1 = transformVertex(c.v1, model);
+        //     Vec3 tv2 = transformVertex(c.v2, model);
+        //     Vec3 tv3 = transformVertex(c.v3, model);
             Vec3 tv0 = project(transformVertex(c.v0, model), scale, width, height);
             Vec3 tv1 = project(transformVertex(c.v1, model), scale, width, height);
             Vec3 tv2 = project(transformVertex(c.v2, model), scale, width, height);
