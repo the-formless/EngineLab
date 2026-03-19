@@ -19,7 +19,7 @@ struct FrameBuffer {
         pixels.resize(height * width);
     }
 
-    FrameBuffer(int h, int w) : width(w), height(h){
+    FrameBuffer(int w, int h) : width(w), height(h){
         pixels.resize(height * width);
     }
 
