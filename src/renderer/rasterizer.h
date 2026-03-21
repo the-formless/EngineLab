@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "framebuffer.h"
+#include "./../../tests/test_utils.h"
 #include <cmath>
 
 class Rasterizer {
@@ -39,25 +40,48 @@ class Rasterizer {
                 }
             }
         }
-        inline static void drawTriangle(FrameBuffer& fb, int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+        inline static void drawTriangle(FrameBuffer& fb, Vec3 v0, Vec3 v1, Vec3 v2, uint32_t color) {
+
+            
+            //compute triangle area
+            float area = edgeFunction(v0.x, v0.y, v1, v2);
+
+            if(floatEqual(area, 0.0f))
+                return;
+
+            //force Counter-ClockWise triangle orientation
+            if(area < 0) {
+                std::swap(v1,v2);
+                area = -area;
+            }
+
+
             //Create a bounding box and then draw a triangle
-            int minX = std::min(std::min(x0, x1), x2);
-            int maxX = std::max(std::max(x0, x1), x2);
+            int minX = std::min(std::min(v0.x, v1.x), v2.x);
+            int maxX = std::max(std::max(v0.x, v1.x), v2.x);
 
-            int minY = std::min(std::min(y0, y1), y2);
-            int maxY = std::max(std::max(y0, y1), y2);
+            int minY = std::min(std::min(v0.y, v1.y), v2.y);
+            int maxY = std::max(std::max(v0.y, v1.y), v2.y);
 
-            int dE0_dx = y1 - y0;
-            int dE0_dy = -(x1 - x0);
-            int dE1_dx = y2 - y1;
-            int dE1_dy = -(x2 - x1);
-            int dE2_dx = y0 - y2;
-            int dE2_dy = -(x0 - x2);
+            //clamping bounding box to screen frame
+            minX = std::max(minX, 0);
+            maxX = std::min(maxX, (int)fb.width - 1);
+
+            minY = std::max(minY, 0);
+            maxY = std::min(maxY, (int)fb.height - 1);
+
+            int dE0_dx = v1.y - v0.y;
+            int dE0_dy = -(v1.x - v0.x);
+            int dE1_dx = v2.y - v1.y;
+            int dE1_dy = -(v2.x - v1.x);
+            int dE2_dx = v0.y - v2.y;
+            int dE2_dy = -(v0.x - v2.x);
             
             //compute row starts for the bounding box 
-            int e0_row = edgeFunction(minX, minY, x0, y0, x1, y1);
-            int e1_row = edgeFunction(minX, minY, x1, y1, x2, y2);
-            int e2_row = edgeFunction(minX, minY, x2, y2, x0, y0);
+            int e0_row = edgeFunction(minX, minY, v0, v1);
+            int e1_row = edgeFunction(minX, minY, v1, v2);
+            int e2_row = edgeFunction(minX, minY, v2, v0);
+
 
             for(int y = minY; y <= maxY; y++) {
 
@@ -68,12 +92,19 @@ class Rasterizer {
                 for(int x = minX; x <= maxX; x++){
                     if((e0 >= 0 &&
                         e1 >= 0 && 
-                        e2 >= 0) ||
-                        (e0 <= 0 &&
-                        e1 <= 0 && 
-                        e2 <= 0)
+                        e2 >= 0)
                     ){
-                        fb.setPixel(x, y, color);
+                        float w0 = (float) e0 / area;
+                        float w1 = (float) e1 / area;
+                        float w2 = (float) e2 / area;
+
+                        float z = w0 * v0.z + w1 * v1.z + w2 * v2.z;
+
+                        if(z < fb.depthAt(x,y)) {
+                            fb.depthAt(x,y) = z;
+                            fb.setPixel(x, y, color);
+                        }
+
                     }
                     e0 += dE0_dx;
                     e1 += dE1_dx;
@@ -88,7 +119,7 @@ class Rasterizer {
         }
     
     private:
-        inline static int edgeFunction(int x, int y, int ex0, int ey0, int ex1, int ey1) {
-            return (x - ex0 ) * (ey1 - ey0) - (y - ey0) * (ex1 - ex0);
+        inline static int edgeFunction(int x, int y, Vec3 a, Vec3 b) {
+            return (x - a.x ) * (b.y - a.y) - (y - a.y) * (b.x - a.x);
         }
 };

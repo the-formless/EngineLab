@@ -14,13 +14,16 @@ struct FrameBuffer {
     int width;
     int height;
     std::vector<uint32_t> pixels;
+    std::vector<float> depth;
 
     FrameBuffer() : width(800), height(600){
         pixels.resize(height * width);
+        depth.resize(height * width);
     }
-
+    
     FrameBuffer(int w, int h) : width(w), height(h){
         pixels.resize(height * width);
+        depth.resize(height * width);
     }
 
     inline void clear(uint32_t color) {
@@ -51,5 +54,15 @@ struct FrameBuffer {
     inline uint32_t pixel(int x, int y) {
         int index = y * width + x;
         return pixels[index];
+    }
+
+    inline void clearDepth(float value = std::numeric_limits<float>::infinity()) {
+        for(auto& d: depth) {
+            d = value;
+        }
+    }
+
+    inline float& depthAt(int x, int y) {
+        return depth[y * width + x];
     }
 };

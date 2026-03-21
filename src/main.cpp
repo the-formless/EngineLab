@@ -17,12 +17,19 @@ Vec3 transformVertex(const Vec3& v, Mat4 model) {
     return Vec3(t.x, t.y, t.z);
 }
 
-Vec3 project(Vec3 v, float scale, int width, int height) {
+Vec3 projectOrtho(Vec3 v, float scale, int width, int height) {
     return {
         v.x * scale + width/2,
     -v.y * scale + height/2,
-    0
+    v.z
     };
+}
+//just implemented perspective projection
+Vec3 projectPerspective(Vec3 v, float scale, int width, int height) {
+    float z = v.z + 10.0f; //move camera back
+    float x = (v.x/z) * scale + width/2;
+    float y = (-v.y/z) * scale + height/2;
+    return {x,y,z};
 }
 
 int main() {
@@ -35,10 +42,11 @@ int main() {
     Grid g(10);
     g.generate();
     static float angle = 0.0f;
-    float scale = 55.0f;
+    float scale = 150.0f;
 
     while(window.processEvents()) {
         fb.clear(BLACK);
+        fb.clearDepth();
         fb.setPixel(400, 300, RED);
 
         Rasterizer::drawLine(fb, 100, 100, 700, 100, GREEN);
@@ -49,23 +57,19 @@ int main() {
         Rasterizer::drawLine(fb, 300, 500, 400, 100, BLUE);
 
         // Rasterizer::drawTriangle(fb, 200,100,100,400,500,400, WHITE);
-        Rasterizer::drawTriangle(fb, 10,10,300,40,40,400, GREEN);
+        // Rasterizer::drawTriangle(fb, 10,10,300,40,40,400, GREEN);
 
         angle += 0.1f;
         Mat4 model = Mat4::rotateY(angle)  * Mat4::rotateX(angle * 0.5f);;
 
         for(const auto& c : g.cells) {
-        //     Vec3 tv0 = transformVertex(c.v0, model);
-        //     Vec3 tv1 = transformVertex(c.v1, model);
-        //     Vec3 tv2 = transformVertex(c.v2, model);
-        //     Vec3 tv3 = transformVertex(c.v3, model);
-            Vec3 tv0 = project(transformVertex(c.v0, model), scale, width, height);
-            Vec3 tv1 = project(transformVertex(c.v1, model), scale, width, height);
-            Vec3 tv2 = project(transformVertex(c.v2, model), scale, width, height);
-            Vec3 tv3 = project(transformVertex(c.v3, model), scale, width, height);
+            Vec3 tv0 = projectPerspective(transformVertex(c.v0, model), scale, width, height);
+            Vec3 tv1 = projectPerspective(transformVertex(c.v1, model), scale, width, height);
+            Vec3 tv2 = projectPerspective(transformVertex(c.v2, model), scale, width, height);
+            Vec3 tv3 = projectPerspective(transformVertex(c.v3, model), scale, width, height);
 
-            Rasterizer::drawTriangle(fb, tv0.x, tv0.y, tv1.x, tv1.y, tv2.x, tv2.y, WHITE);
-            Rasterizer::drawTriangle(fb, tv2.x, tv2.y, tv1.x, tv1.y, tv3.x, tv3.y, RED);
+            Rasterizer::drawTriangle(fb, tv0, tv1, tv2, WHITE);
+            Rasterizer::drawTriangle(fb, tv2, tv1, tv3, RED);
         }
         
 
