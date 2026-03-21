@@ -117,9 +117,47 @@ class Rasterizer {
             }
 
         }
+        
+        inline static Vec3 processVertex(const Vec3& v, const Mat4& model, const Mat4& view, const Mat4& proj) {
+            Vec4 world = transformVertex(v, model);
+            Vec4 viewVertex = view * world;
+            Vec4 clip = proj * viewVertex;
+            Vec3 divide = ndc(clip);
+            Vec3 screen = viewportTransform(divide, 800, 600);
+            //return with depth
+            return {
+                screen.x,
+                screen.y,
+                clip.w
+            };
+        }
     
     private:
         inline static int edgeFunction(int x, int y, Vec3 a, Vec3 b) {
             return (x - a.x ) * (b.y - a.y) - (y - a.y) * (b.x - a.x);
+        }
+
+
+        inline static Vec4 transformVertex(const Vec3& v, const Mat4& model) {
+            Vec4 v4(v, 1.0f);
+            Vec4 t = model * v4;
+            return t;
+        }
+
+        inline static Vec3 ndc(const Vec4& v) {
+            //Perspective divide
+            return {
+                v.x/v.w,
+                v.y/v.w,
+                v.z/v.w
+            };
+        }
+
+        static inline Vec3 viewportTransform(const Vec3& ndc, int width, int height) {
+            float x = (ndc.x + 1.0f) * 0.5f * width;
+            float y = (1.0f - ndc.y) * 0.5f * height; // flip Y (NDC up → screen down)
+            float z = ndc.z; // keep as-is (we'll override with clip.w for depth)
+
+            return { x, y, z };
         }
 };
