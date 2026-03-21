@@ -136,4 +136,12 @@ struct Mat4 {
             Vec4(0.0f, 0.0f, 0.0f, 1.0f)
         );
     }
+    static inline Mat4 perspective(float fov, float aspect, float near, float far) { 
+        //compute scaling factor 
+        float f = 1.0f / std::tan(fov / 2.0f); 
+        return Mat4( Vec4(f/aspect, 0.0f, 0.0f, 0.0f), 
+            Vec4(0.0f, f, 0.0f , 0.0f), 
+            Vec4(0.0f, 0.0f, (far+near)/(near-far), (2*far*near)/(near-far)), 
+            Vec4(0.0f, 0.0f, -1.0f, 0.0f) ); 
+    }
 };

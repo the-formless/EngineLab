@@ -28,6 +28,8 @@ struct Vec4 {
         return Vec4(x*inv, y*inv, z*inv, w*inv);
     }
 
+    inline operator Vec3() const { return {x, y, z};}
+
     inline float operator[](int i) const {
         switch(i){
             case 0: 
