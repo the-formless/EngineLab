@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "framebuffer.h"
+#include "vertex.h"
 #include "./../../tests/test_utils.h"
 #include <cmath>
 
@@ -40,11 +41,11 @@ class Rasterizer {
                 }
             }
         }
-        inline static void drawTriangle(FrameBuffer& fb, Vec3 v0, Vec3 v1, Vec3 v2, uint32_t color) {
+        inline static void drawTriangle(FrameBuffer& fb, Vertex v0, Vertex v1, Vertex v2, uint32_t color) {
 
             
             //compute triangle area
-            float area = edgeFunction(v0.x, v0.y, v1, v2);
+            float area = edgeFunction(v0.position.x, v0.position.y, v1, v2);
 
             if(floatEqual(area, 0.0f))
                 return;
@@ -57,11 +58,11 @@ class Rasterizer {
 
 
             //Create a bounding box and then draw a triangle
-            int minX = std::min(std::min(v0.x, v1.x), v2.x);
-            int maxX = std::max(std::max(v0.x, v1.x), v2.x);
+            int minX = std::min(std::min(v0.position.x, v1.position.x), v2.position.x);
+            int maxX = std::max(std::max(v0.position.x, v1.position.x), v2.position.x);
 
-            int minY = std::min(std::min(v0.y, v1.y), v2.y);
-            int maxY = std::max(std::max(v0.y, v1.y), v2.y);
+            int minY = std::min(std::min(v0.position.y, v1.position.y), v2.position.y);
+            int maxY = std::max(std::max(v0.position.y, v1.position.y), v2.position.y);
 
             //clamping bounding box to screen frame
             minX = std::max(minX, 0);
@@ -70,12 +71,12 @@ class Rasterizer {
             minY = std::max(minY, 0);
             maxY = std::min(maxY, (int)fb.height - 1);
 
-            int dE0_dx = v1.y - v0.y;
-            int dE0_dy = -(v1.x - v0.x);
-            int dE1_dx = v2.y - v1.y;
-            int dE1_dy = -(v2.x - v1.x);
-            int dE2_dx = v0.y - v2.y;
-            int dE2_dy = -(v0.x - v2.x);
+            int dE0_dx = v1.position.y - v0.position.y;
+            int dE0_dy = -(v1.position.x - v0.position.x);
+            int dE1_dx = v2.position.y - v1.position.y;
+            int dE1_dy = -(v2.position.x - v1.position.x);
+            int dE2_dx = v0.position.y - v2.position.y;
+            int dE2_dy = -(v0.position.x - v2.position.x);
             
             //compute row starts for the bounding box 
             int e0_row = edgeFunction(minX, minY, v0, v1);
@@ -98,7 +99,7 @@ class Rasterizer {
                         float w1 = (float) e1 / area;
                         float w2 = (float) e2 / area;
 
-                        float z = w0 * v0.z + w1 * v1.z + w2 * v2.z;
+                        float z = w0 * v0.position.z + w1 * v1.position.z + w2 * v2.position.z;
 
                         if(z < fb.depthAt(x,y)) {
                             fb.depthAt(x,y) = z;
@@ -118,7 +119,7 @@ class Rasterizer {
 
         }
         
-        inline static Vec3 processVertex(const Vec3& v, const Mat4& model, const Mat4& view, const Mat4& proj) {
+        inline static Vec3 processVertex(const Vertex& v, const Mat4& model, const Mat4& view, const Mat4& proj) {
             Vec4 world = transformVertex(v, model);
             Vec4 viewVertex = view * world;
             Vec4 clip = proj * viewVertex;
@@ -133,13 +134,13 @@ class Rasterizer {
         }
     
     private:
-        inline static int edgeFunction(int x, int y, Vec3 a, Vec3 b) {
-            return (x - a.x ) * (b.y - a.y) - (y - a.y) * (b.x - a.x);
+        inline static int edgeFunction(int x, int y, Vertex a, Vertex b) {
+            return (x - a.position.x ) * (b.position.y - a.position.y) - (y - a.position.y) * (b.position.x - a.position.x);
         }
 
 
-        inline static Vec4 transformVertex(const Vec3& v, const Mat4& model) {
-            Vec4 v4(v, 1.0f);
+        inline static Vec4 transformVertex(const Vertex& v, const Mat4& model) {
+            Vec4 v4(v.position, 1.0f);
             Vec4 t = model * v4;
             return t;
         }
