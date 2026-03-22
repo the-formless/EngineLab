@@ -70,5 +70,8 @@ struct alignas(16) Vec3 {
     static inline Vec3 lerp(const Vec3& a, const Vec3& b, float t) {
         return a * (1.0f - t) + b * t;
     }
-        
+    
+    static inline void debugPrint(Vec3 p) {
+        std::cout << "x: " <<p.x<< ", y: "<< p.y <<", z: "<<p.z<<std::endl;
+    }
 };

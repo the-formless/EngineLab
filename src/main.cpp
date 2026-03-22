@@ -6,6 +6,7 @@
 #include "renderer/framebuffer.h"
 #include "renderer/rasterizer.h"
 #include "grid/grid.h"
+#include "camera/camera.h"
 
 void runMathTests();
 void runFrameBufferTests();
@@ -55,13 +56,15 @@ int main() {
     float near = 0.1f;
     float far = 100.0f;
 
-    Mat4 proj = Mat4::perspective(fov, aspect, near, far);
-    Mat4 view(
-        {-1.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 1.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, -1.0f, -20.0f},
-        {0.0f, 0.0f, 0.0f, 1.0f}
+    Camera cam(
+        {0,0,10},
+        {0,0,0},
+        {0,1,0},
+        fov, aspect, near, far
     );
+
+    Mat4 proj = cam.getProjectionMatrix();
+    Mat4 camView = cam.getViewMatrix();
 
     while(window.processEvents()) {
         fb.clear(BLACK);
@@ -82,10 +85,10 @@ int main() {
         Mat4 model = Mat4::rotateY(angle)  * Mat4::rotateX(angle * 0.5f);;
 
         for(const auto& c : g.cells) {
-            Vec3 tv0 = Rasterizer::processVertex(c.v0, model, view, proj);
-            Vec3 tv1 = Rasterizer::processVertex(c.v1, model, view, proj);
-            Vec3 tv2 = Rasterizer::processVertex(c.v2, model, view, proj);
-            Vec3 tv3 = Rasterizer::processVertex(c.v3, model, view, proj);
+            Vec3 tv0 = Rasterizer::processVertex(c.v0, model, camView, proj);
+            Vec3 tv1 = Rasterizer::processVertex(c.v1, model, camView, proj);
+            Vec3 tv2 = Rasterizer::processVertex(c.v2, model, camView, proj);
+            Vec3 tv3 = Rasterizer::processVertex(c.v3, model, camView, proj);
 
             Rasterizer::drawTriangle(fb, tv0, tv1, tv2, WHITE);
             Rasterizer::drawTriangle(fb, tv2, tv1, tv3, RED);
@@ -98,3 +101,4 @@ int main() {
     
     return 0;
 }
+

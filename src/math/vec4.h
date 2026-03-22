@@ -67,4 +67,7 @@ struct Vec4 {
         return (a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w);
     }
 
+    static inline void debugPrint(Vec4 p) {
+        std::cout << "x: " <<p.x<< ", y: "<< p.y <<", z: "<<p.z<<", w: "<<p.w<<std::endl;
+    }
 };

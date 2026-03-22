@@ -145,6 +145,7 @@ class Rasterizer {
         }
 
         inline static Vec3 ndc(const Vec4& v) {
+            //NDC = normalized device coordinates
             //Perspective divide
             return {
                 v.x/v.w,
