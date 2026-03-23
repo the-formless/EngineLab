@@ -5,8 +5,9 @@
 #include "renderer/sdl_window.h"
 #include "renderer/framebuffer.h"
 #include "renderer/rasterizer.h"
-#include "models/grid.h"
-#include "camera/camera.h"
+#include "scene/grid.h"
+#include "scene/cube.h"
+#include "scene/camera.h"
 
 void runMathTests();
 void runFrameBufferTests();
@@ -37,7 +38,16 @@ float degreesToRadians(float degrees) {
 
 
 
+bool isFrontFace(Vertex v0, Vertex v1, Vertex v2) {   
+    Vec3 e1 = v1.viewPos - v0.viewPos;
+    Vec3 e2 = v2.viewPos - v0.viewPos;
 
+    Vec3 normal = Vec3::cross(e1, e2);
+
+    if(normal.z >= 0)
+        return true;
+    return false;
+}
 
 int main() {
 
@@ -66,21 +76,34 @@ int main() {
     Mat4 proj = cam.getProjectionMatrix();
     Mat4 camView = cam.getViewMatrix();
 
+    Cube cube(1);
+    cube.generate();
+
     while(window.processEvents()) {
         fb.clear(BLACK);
         fb.clearDepth();
-        
+
         angle += 0.1f;
         Mat4 model = Mat4::rotateY(angle)  * Mat4::rotateX(angle * 0.5f);;
 
-        for(const auto& c : g.cells) {
-            Vec3 tv0 = Rasterizer::processVertex(c.v0, model, camView, proj);
-            Vec3 tv1 = Rasterizer::processVertex(c.v1, model, camView, proj);
-            Vec3 tv2 = Rasterizer::processVertex(c.v2, model, camView, proj);
-            Vec3 tv3 = Rasterizer::processVertex(c.v3, model, camView, proj);
+        // for(const auto& c : g.cells) {
+        //     Vec3 tv0 = Rasterizer::processVertex(c.v0, model, camView, proj);
+        //     Vec3 tv1 = Rasterizer::processVertex(c.v1, model, camView, proj);
+        //     Vec3 tv2 = Rasterizer::processVertex(c.v2, model, camView, proj);
+        //     Vec3 tv3 = Rasterizer::processVertex(c.v3, model, camView, proj);
 
-            Rasterizer::drawTriangle(fb, tv0, tv1, tv2, WHITE);
-            Rasterizer::drawTriangle(fb, tv2, tv1, tv3, RED);
+        //     Rasterizer::drawTriangle(fb, tv0, tv1, tv2, WHITE);
+        //     Rasterizer::drawTriangle(fb, tv2, tv1, tv3, RED);
+        // }
+
+        for(auto& f : cube.tris) {
+            Vertex tv0 = Rasterizer::processVertex(f.v0, model, camView, proj);
+            Vertex tv1 = Rasterizer::processVertex(f.v1, model, camView, proj);
+            Vertex tv2 = Rasterizer::processVertex(f.v2, model, camView, proj);
+            
+            //back face culling
+            if (!isFrontFace(tv0, tv1, tv2)) continue;
+            Rasterizer::drawTriangle(fb, tv0, tv1, tv2);
         }
         
 

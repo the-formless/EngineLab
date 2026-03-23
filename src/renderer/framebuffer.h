@@ -9,6 +9,8 @@
 #define RED   0xFFFF0000
 #define GREEN 0xFF00FF00
 #define BLUE  0xFF0000FF
+#define CYAN  0x00FFFF
+#define ORANGE 0xFFA500
 
 struct FrameBuffer {
     int width;

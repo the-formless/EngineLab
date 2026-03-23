@@ -41,7 +41,7 @@ class Rasterizer {
                 }
             }
         }
-        inline static void drawTriangle(FrameBuffer& fb, Vertex v0, Vertex v1, Vertex v2, uint32_t color) {
+        inline static void drawTriangle(FrameBuffer& fb, Vertex v0, Vertex v1, Vertex v2) {
 
             
             //compute triangle area
@@ -99,11 +99,26 @@ class Rasterizer {
                         float w1 = (float) e1 / area;
                         float w2 = (float) e2 / area;
 
-                        float z = w0 * v0.position.z + w1 * v1.position.z + w2 * v2.position.z;
+                        // Vec3 color = v0.getFloatColourVec3() * w0 + 
+                        //                 v1.getFloatColourVec3() * w1 +
+                        //                 v2.getFloatColourVec3() * w2;
 
-                        if(z < fb.depthAt(x,y)) {
-                            fb.depthAt(x,y) = z;
-                            fb.setPixel(x, y, color);
+                        Vec3 c0 = v0.getFloatColourVec3();
+                        Vec3 c1 = v1.getFloatColourVec3();
+                        Vec3 c2 = v2.getFloatColourVec3();
+
+                        float invW = w0 * v0.invW + w1 * v1.invW + w2 * v2.invW;
+
+                        Vec3 color = (c0 * v0.invW * w0 +
+                                        c1 * v1.invW * w1 +
+                                        c2 * v2.invW * w2) / invW;
+
+                        // float z = w0 * v0.position.z + w1 * v1.position.z + w2 * v2.position.z;
+                        float depth = 1.0f / invW;
+
+                        if(depth < fb.depthAt(x,y)) {
+                            fb.depthAt(x,y) = depth;
+                            fb.setPixel(x, y, getFinalColor(color));
                         }
 
                     }
@@ -119,18 +134,20 @@ class Rasterizer {
 
         }
         
-        inline static Vec3 processVertex(const Vertex& v, const Mat4& model, const Mat4& view, const Mat4& proj) {
+        inline static Vertex processVertex(const Vertex& v, const Mat4& model, const Mat4& view, const Mat4& proj) {
             Vec4 world = transformVertex(v, model);
             Vec4 viewVertex = view * world;
             Vec4 clip = proj * viewVertex;
+            Vec3 viewPos = {viewVertex.x, viewVertex.y, viewVertex.z};
             Vec3 divide = ndc(clip);
             Vec3 screen = viewportTransform(divide, 800, 600);
+            float invW = 1.0f / clip.w;
             //return with depth
-            return {
+            return Vertex({
                 screen.x,
                 screen.y,
                 clip.w
-            };
+            }, viewPos, invW, v.color);
         }
     
     private:
@@ -161,5 +178,13 @@ class Rasterizer {
             float z = ndc.z; // keep as-is (we'll override with clip.w for depth)
 
             return { x, y, z };
+        }
+
+        inline static uint32_t getFinalColor(Vec3 color) {
+            uint32_t r = (uint32_t)(color.x * 255.0f);
+            uint32_t g = (uint32_t)(color.y * 255.0f);
+            uint32_t b = (uint32_t)(color.z * 255.0f);
+
+            return (255 << 24) | (r << 16) | (g << 8) | b;
         }
 };

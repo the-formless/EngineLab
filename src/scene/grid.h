@@ -7,17 +7,17 @@
 #include "./../renderer/vertex.h"
 
 
-struct Triangle {
-    Vec3 v0, v1, v2;
-    uint32_t color;
-    Triangle() : v0(Vec3()), v1(Vec3()), v2(Vec3()), color(0xffffff) {}
-    Triangle(Vec3 v0, Vec3 v1, Vec3 v2, uint32_t color) : v0(v0), v1(v1), v2(v2), color(color) {}
+// struct Triangle {
+//     Vertex v0, v1, v2;
+//     uint32_t color;
+//     Triangle() : v0(Vertex()), v1(Vertex()), v2(Vertex()), color(0xffffff) {}
+//     Triangle(Vertex v0, Vertex v1, Vertex v2, uint32_t color) : v0(v0), v1(v1), v2(v2), color(color) {}
 
-};
+// };
 
 struct Cell {
     Vertex v0, v1, v2, v3;
-    Triangle t0, t1;
+    // Triangle t0, t1;
     Cell() : v0(), v1(), v2(), v3() {}
     Cell(Vertex v0, Vertex v1, Vertex v2, Vertex v3) : v0(v0), v1(v1), v2(v2), v3(v3) {}
 };
